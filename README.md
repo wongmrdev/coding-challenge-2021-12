@@ -1,6 +1,6 @@
 # Getting Started with this assignment
 
-The app can be accessed (here)[https://main.dhuyh5ziste2s.amplifyapp.com/]
+The app can be accessed [here](https://main.dhuyh5ziste2s.amplifyapp.com/)
 
 I've added two routes for this app, one for data search and one for data ingestion
 Included in this app is a React Front End which a user can directly upload files or copy paste DNA Sequence JSON into the browser. There is a GraphQL API endpoint powered by AWS Appsync where users can use a Graphiql interface to submit.
