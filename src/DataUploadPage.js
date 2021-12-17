@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom';
 
 //api CRUD section
@@ -12,7 +12,7 @@ Amplify.configure(awsExports);
 function App() {
   const [textAreaValue, setTextAreaValue] = useState("")
   //upload status feedback for the user
-  const [uploadStatusList, setUploadStatusList] = useState(["upload status to show here", "choose files to upload"])
+  const [uploadStatusList, setUploadStatusList] = useState(["choose files to upload"])
 
   function handleTextAreaChange(value) {
     setTextAreaValue(value)
@@ -57,6 +57,9 @@ function App() {
       && item.creator.hasOwnProperty("id")
       && item.creator.hasOwnProperty("handle")
       && item.creator.hasOwnProperty("name")
+      && item.creator.id !== null
+      && item.creator.handle !== null
+      && item.creator.name !== null
     ) {
       return true
     }
@@ -81,24 +84,6 @@ function App() {
         console.log(item)
         addDnaSequence(item).then(response => {
           console.log("response: ", response)
-          if (response.dnaSequence.status === "failed" && response.creator.status === "failed") {
-            console.log("both failed")
-            newItems.push(fileList.item(i).name + ": both failed")
-          } else if (response.dnaSequence.status === "success" && response.creator.status === "failed") {
-            console.log("dnaSequence success, creator fail")
-            newItems.push(fileList.item(i).name + ": dnaSequence success, creator fail")
-          }
-          else if (response.dnaSequence.status === "failed" && response.creator.status === "success") {
-            console.log("dnaSequence success, creator fail")
-            newItems.push(fileList.item(i).name + ": dnaSequence failed, creator success")
-          } else {
-            console.log("dnaSequence success, creator success")
-            newItems.push(fileList.item(i).name + ": both success")
-          }
-          handleUploadStatusListChange(newItems)
-
-
-
 
         })
       }
@@ -106,8 +91,6 @@ function App() {
     }
     //update progress of file upload
 
-    newItems.forEach(item => console.log(`${item}`))
-    handleUploadStatusListChange(newItems)
   }
 
   function handleUploadStatusListChange(newItems) {

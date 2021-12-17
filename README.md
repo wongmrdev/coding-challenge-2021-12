@@ -9,7 +9,7 @@ The App is deployed on the AWS Global CDN.
 
 # Considerations for the future:
 
-1. Paginations/Lazy Loading
+1. Fetch Data from An benchling API
 2. More Sanitation (on creators)
 3. Documentation for API
 4. Authentication and Authorization and roles
@@ -19,6 +19,7 @@ The App is deployed on the AWS Global CDN.
 8. Add memoization and Query Cache
 9. Remove creators only when all their DNA Sequences are removed
 10. Add data streams to other applications
+11. Paginations/Lazy Loading
 
 # Thoughts
 

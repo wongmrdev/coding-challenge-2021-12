@@ -13,7 +13,8 @@ export default function SearchPage() {
     searchString,
     displayedSequences,
     handleSequenceChange,
-    dnaSequences } = useContext(SequenceContext)
+    dnaSequences,
+  } = useContext(SequenceContext)
 
   function handleSearch() {
     if (searchString === "") {
@@ -43,6 +44,7 @@ export default function SearchPage() {
       }
 
     })
+    handleDisplayedSequencesChange([])
 
   }
 
@@ -51,11 +53,11 @@ export default function SearchPage() {
 
   }
 
-  async function fetchDnaSequences(searchString = "", limit = 10) {
+  async function fetchDnaSequences(searchString = "", limit = 500) {
     try {
       const dnaSequenceData = await API.graphql(graphqlOperation(listDnaSequences, {
         filter: { bases: { contains: searchString } },
-        limit: 20
+        limit: limit
       }))
       const fetchedDnaSequences = dnaSequenceData.data.listDnaSequences.items
       console.log(fetchedDnaSequences)
@@ -68,9 +70,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchDnaSequences()
-    return () => {
 
-    }
   }, [])
 
 
