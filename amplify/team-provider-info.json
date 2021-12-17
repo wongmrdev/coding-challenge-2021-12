@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-asimovsandbox-dev-234146-authRole",
+      "UnauthRoleArn": "arn:aws:iam::440216772824:role/amplify-asimovsandbox-dev-234146-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::440216772824:role/amplify-asimovsandbox-dev-234146-authRole",
+      "Region": "us-west-2",
+      "DeploymentBucketName": "amplify-asimovsandbox-dev-234146-deployment",
+      "UnauthRoleName": "amplify-asimovsandbox-dev-234146-unauthRole",
+      "StackName": "amplify-asimovsandbox-dev-234146",
+      "StackId": "arn:aws:cloudformation:us-west-2:440216772824:stack/amplify-asimovsandbox-dev-234146/65df4e80-5e54-11ec-a3ce-0a04ec863665",
+      "AmplifyAppId": "dhuyh5ziste2s"
+    }
+  }
+}

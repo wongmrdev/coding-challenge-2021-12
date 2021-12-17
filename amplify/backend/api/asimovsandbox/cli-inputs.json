@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "asimovsandbox",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "C:\\Users\\matthew wong\\Documents\\webdev\\2021DecemberInterviewPrep\\asimov_sandbox\\amplify\\backend\\api\\asimovsandbox\\schema.graphql",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 7
+    }
+  }
+}

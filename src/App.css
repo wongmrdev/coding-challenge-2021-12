@@ -1,38 +1,95 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
 }
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 10vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  align-content: center;
+  justify-content: space-evenly;
   font-size: calc(10px + 2vmin);
   color: white;
+  text-align: center;
+  padding: 5px;
+  flex-wrap: wrap;
 }
 
 .App-link {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.json {
+  padding: 5px;
+}
+
+#createDnaSequence {
+  background-color: #282c34;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  justify-content: space-evenly;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  text-align: center;
+  padding: 5px;
+  flex-wrap: wrap;
+}
+
+.nav-btn {
+  text-decoration: none;
+  color: white;
+  background-color: #15d798;
+  border-radius: 3px;
+  padding: 10px 20px;
+}
+
+.submit-data-btn {
+  text-decoration: none;
+  color: white;
+  background-color: #15d798;
+  border-radius: 3px;
+  padding: 10px 20px;
+}
+
+.data-upload-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+#bulk-uploads-container {
+  background-color: #282c34;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  text-align: center;
+}
+
+#data-upload-title {
+}
+
+.vertical-flex-container {
+  padding: 5px;
+  padding-top: 15px;
+  background-color: #ffffff;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  justify-content: space-evenly;
+  font-size: calc(10px + 1vmin);
+  color: rgb(0, 0, 0);
+  text-align: center;
+
+  flex-wrap: wrap;
 }
