@@ -11,19 +11,28 @@ Amplify.configure(awsExports);
 
 function App() {
   const [textAreaValue, setTextAreaValue] = useState("")
+  //upload status feedback for the user
+  const [uploadStatusList, setUploadStatusList] = useState(["upload status to show here", "choose files to upload"])
+
   function handleTextAreaChange(value) {
     setTextAreaValue(value)
   }
 
-  useEffect(() => {
-    console.log(textAreaValue)
-    return () => {
-
-    }
-  }, [textAreaValue])
 
   function handleTextAreaSubmit() {
-    isJson(textAreaValue) ? console.log(textAreaValue) : alert("not valid Json")
+    isJson(textAreaValue) ? console.log(textAreaValue) : setUploadStatusList([...uploadStatusList, "text area not valid Json"])
+    let dnaSequence = JSON.parse(textAreaValue)
+    if (hasDnaSequenceProperties(dnaSequence)) {
+      addDnaSequence(dnaSequence).then(response => {
+        console.log(response)
+        setUploadStatusList([...uploadStatusList, `manual input: ${response.dnaSequence.message}, ${response.creator.message}`])
+      })
+
+    } else {
+      setUploadStatusList([...uploadStatusList, "manual input: check your input"])
+    }
+
+
 
   }
   //check for valid json submissions
@@ -36,7 +45,7 @@ function App() {
   }
   //check to make sure the sequence doesnt already exist
   //upload a file and read the json file
-  const [uploadStatusList, setUploadStatusList] = useState(["upload status to show here", "choose files to upload"])
+
   //sanatise input files, could add more to make sure the data-types are correct
   function hasDnaSequenceProperties(item) {
     console.log("item: ", item);
@@ -61,7 +70,7 @@ function App() {
 
 
   function handleFileListSubmit(fileList) { //FileList is an HTML Collection
-    setUploadStatusList(["upload status to show here", "choose files to upload"])
+
     let newItems = [];
     for (let i = 0; i < fileList.length; i++) {
       console.log("file name: ", fileList.item(i).name)
@@ -71,21 +80,38 @@ function App() {
         item = JSON.parse(reader.result)
         console.log(item)
         addDnaSequence(item).then(response => {
-          console.log(response)
-          if (response.status === "failed") {
-            newItems.push(fileList.item(i).name + ":" + response.message)
-          } else {
-            newItems.push(fileList.item(i).name + " succeeded")
+          console.log("response: ", response)
+          if (response.dnaSequence.status === "failed" && response.creator.status === "failed") {
+            console.log("both failed")
+            newItems.push(fileList.item(i).name + ": both failed")
+          } else if (response.dnaSequence.status === "success" && response.creator.status === "failed") {
+            console.log("dnaSequence success, creator fail")
+            newItems.push(fileList.item(i).name + ": dnaSequence success, creator fail")
           }
-          //update progress of file upload
+          else if (response.dnaSequence.status === "failed" && response.creator.status === "success") {
+            console.log("dnaSequence success, creator fail")
+            newItems.push(fileList.item(i).name + ": dnaSequence failed, creator success")
+          } else {
+            console.log("dnaSequence success, creator success")
+            newItems.push(fileList.item(i).name + ": both success")
+          }
+          handleUploadStatusListChange(newItems)
+
+
 
 
         })
       }
       reader.readAsText(fileList.item(i))
-
-      setUploadStatusList([...uploadStatusList, ...newItems])
     }
+    //update progress of file upload
+
+    newItems.forEach(item => console.log(`${item}`))
+    handleUploadStatusListChange(newItems)
+  }
+
+  function handleUploadStatusListChange(newItems) {
+    setUploadStatusList([...uploadStatusList, ...newItems])
   }
 
 
@@ -114,24 +140,25 @@ function App() {
       console.log(creator)
       if (dnaSequence.data.getDnaSequence) {
         console.log("sequence exists")
-        response = { status: "failed", message: "DNA Sequence Already Exists" }
+        response = { ...response, dnaSequence: { status: "failed", message: "DNA Sequence already exists" } }
       } else {
         await API.graphql(graphqlOperation(createDnaSequence, { input: dnaSequenceObjectInput }))
         console.log("upload complete for DNA Sequence" + dnaSequenceObject.name)
+        response = { ...response, dnaSequence: { status: "success", message: "Upload success" } }
       }
       if (creator.data.getCreator) {
         console.log("creator exists")
-        response = { status: "failed", message: "creator Already Exists" }
+        response = { ...response, creator: { status: "failed", message: "creator Already Exists" } }
       } else {
         await API.graphql(graphqlOperation(createCreator, { input: creatorObjectInput }))
         console.log("upload complete for creator Sequence" + dnaSequenceObject.creator.name)
-        response = { status: "success" }
+        response = { ...response, creator: { status: "success" } }
       }
       return response
 
     } catch (error) {
       console.log("error adding DNA sequence on POST", error)
-      response = { status: "failed", message: "unknown error, see log" }
+      response = { status: "failed", message: "unknown error, see log", creator: { status: "failed" }, dnaSequence: { status: "failed" } }
       return response
 
     }
