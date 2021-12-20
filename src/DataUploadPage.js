@@ -26,7 +26,7 @@ function App() {
     } else if (searchString.length < 3) {
       alert("searchs must be greater than 2bp in length")
     } else {
-      console.log("searching")
+      //console.log("searching")
       fetchDnaSequences(searchString)
     }
     setSearchString(searchString)
@@ -39,7 +39,7 @@ function App() {
         limit: limit
       }))
       const fetchedDnaSequences = dnaSequenceData.data.listDnaSequences.items
-      console.log(fetchedDnaSequences)
+      //console.log(fetchedDnaSequences)
       handleDisplayedSequencesChange(fetchedDnaSequences)
     } catch (error) {
       console.log(error)
@@ -56,6 +56,8 @@ function App() {
   const [textAreaValue, setTextAreaValue] = useState("")
   //upload status feedback for the user
   const [uploadStatusList, setUploadStatusList] = useState(["choose files to upload"])
+  //disable buttons while request is inflight
+  const [isDisabled, setIsDisabled] = useState(false)
 
   function handleTextAreaChange(value) {
     setTextAreaValue(value)
@@ -63,11 +65,11 @@ function App() {
 
 
   function handleTextAreaSubmit() {
+    setIsDisabled(true)
     isJson(textAreaValue) ? console.log(textAreaValue) : setUploadStatusList([...uploadStatusList, "text area not valid Json"])
     let dnaSequence = JSON.parse(textAreaValue)
     if (hasDnaSequenceProperties(dnaSequence)) {
       addDnaSequence(dnaSequence).then(response => {
-        console.log(response)
         setUploadStatusList([...uploadStatusList, `manual input: ${response.dnaSequence.message}, ${response.creator.message}`])
       })
 
@@ -76,6 +78,7 @@ function App() {
 
     }
     handleSearch(searchString)
+    setIsDisabled(false)
 
   }
   //check for valid json submissions
@@ -91,7 +94,7 @@ function App() {
 
   //sanatise input files, could add more to make sure the data-types are correct
   function hasDnaSequenceProperties(item) {
-    console.log("item: ", item);
+
     if (item.hasOwnProperty("name")
       && item.hasOwnProperty("bases")
       && item.hasOwnProperty("id")
@@ -123,6 +126,7 @@ function App() {
 
 
   async function handleFileListSubmit(fileList) { //FileList is an HTML Collection
+    setIsDisabled(true)
     let newItems = []
     //loop over fileList and start async post request
     for (let i = 0; i < fileList.length; i++) {
@@ -133,6 +137,7 @@ function App() {
     }
     handleUploadStatusListChange(newItems)
     handleSearch(searchString)
+    setIsDisabled(false)
 
   }
 
@@ -187,23 +192,23 @@ function App() {
     try {
       if (!hasDnaSequenceProperties(dnaSequenceObject)) { return false }
       const dnaSequence = await API.graphql(graphqlOperation(getDnaSequence, { id: dnaSequenceObject.id }))
-      console.log(dnaSequence)
+      //console.log(dnaSequence)
       const creator = await API.graphql(graphqlOperation(getCreator, { id: dnaSequenceObject.creator.id }))
-      console.log(creator)
+      //console.log(creator)
       if (dnaSequence.data.getDnaSequence) {
-        console.log("sequence exists")
+        //console.log("sequence exists")
         response = { ...response, dnaSequence: { status: "failed", message: "DNA Sequence already exists" } }
       } else {
         await API.graphql(graphqlOperation(createDnaSequence, { input: dnaSequenceObjectInput }))
-        console.log("upload complete for DNA Sequence" + dnaSequenceObject.name)
+        //console.log("upload complete for DNA Sequence" + dnaSequenceObject.name)
         response = { ...response, dnaSequence: { status: "success", message: "Upload success" } }
       }
       if (creator.data.getCreator) {
-        console.log("creator exists")
+        //console.log("creator exists")
         response = { ...response, creator: { status: "failed", message: "creator Already Exists" } }
       } else {
         await API.graphql(graphqlOperation(createCreator, { input: creatorObjectInput }))
-        console.log("upload complete for creator Sequence" + dnaSequenceObject.creator.name)
+        //console.log("upload complete for creator Sequence" + dnaSequenceObject.creator.name)
         response = { ...response, creator: { status: "success" } }
       }
       return response
@@ -224,11 +229,11 @@ function App() {
 
       <div className="App">
         <header className="App-header">
-          <Link className="nav-btn" to='/search'>
+          {<Link disabled={isDisabled} className="nav-btn" to='/search'>
             <div>
               Search Data
             </div>
-          </Link>
+          </Link>}
           <label id="data-upload-title" htmlFor="createDnaSequence">Add JSON format DNA Sequence</label>
 
 
@@ -249,10 +254,10 @@ function App() {
 
       <div id="bulk-uploads-container">Bulk Uploads</div>
       <div className="vertical-flex-container">
-        <input type="file" id="bulk-uploads" multiple accept=".json, .txt" onChange={(event) => handleFileListSubmit(event.target.files)}></input>
+        <input disabled={isDisabled} type="file" id="bulk-uploads" multiple accept=".json, .txt" onChange={(event) => handleFileListSubmit(event.target.files)}></input>
         <ul>
           {
-            uploadStatusList.map((status, index) => <li key={index}>{index}. {status}</li>)
+            uploadStatusList.map((status, index) => <li key={index}>{index === 0 ? "" : index + "."} {status}</li>)
           }
         </ul>
       </div>
