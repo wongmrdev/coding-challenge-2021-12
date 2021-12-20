@@ -115,3 +115,7 @@ button {
 ul li {
   text-align: left;
 }
+
+a[disabled] {
+  pointer-events: none;
+}
