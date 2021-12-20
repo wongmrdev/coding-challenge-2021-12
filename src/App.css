@@ -116,6 +116,7 @@ ul li {
   text-align: left;
 }
 
-a[disabled] {
+a[disabled],
+span[disabled] {
   pointer-events: none;
 }
