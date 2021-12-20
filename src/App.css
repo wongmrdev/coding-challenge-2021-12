@@ -93,3 +93,25 @@
 
   flex-wrap: wrap;
 }
+
+.search-input {
+  padding: 5px;
+  font-size: 16px;
+  border-width: 2px;
+  background-color: #ffffff;
+  color: #000000;
+  border-style: solid;
+  border-radius: 5px;
+  min-width: 210px;
+}
+.css-input:focus {
+  outline: none;
+}
+
+button {
+  font-size: 16px;
+}
+
+ul li {
+  text-align: left;
+}

@@ -50,7 +50,8 @@ function App() {
     searchString,
     setSearchString,
     displayedSequences,
-    dnaSequences
+    dnaSequences,
+    setDnaSequences,
   }
 
 

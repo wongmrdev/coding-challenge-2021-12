@@ -1,12 +1,13 @@
 import './App.css';
-import React, { useEffect, useContext } from 'react'
+import React, { useState, useContext } from 'react'
 import { SequenceContext } from './App';
 import { Link } from 'react-router-dom';
 
 //api CRUD section
 import { API, graphqlOperation } from 'aws-amplify'
-import { listDnaSequences } from './graphql/queries'
+import { listDnaSequences, listCreators } from './graphql/queries'
 import { deleteDnaSequence, deleteCreator } from './graphql/mutations'
+
 export default function SearchPage() {
 
   const { handleDnaSequenceSanitation,
@@ -14,42 +15,88 @@ export default function SearchPage() {
     displayedSequences,
     handleSequenceChange,
     dnaSequences,
+    setSearchString
   } = useContext(SequenceContext)
 
-  function handleSearch() {
+  const [creatorsDeleteStatus, setCreatorsDeleteStatus] = useState('')
+
+  async function handleSearch(searchString = "") {
     if (searchString === "") {
-      fetchDnaSequences()
+      const response = await fetchDnaSequences()
     } else if (searchString.length < 3) {
       alert("searchs must be greater than 2bp in length")
     } else {
       console.log("searching")
-      fetchDnaSequences(searchString)
+      const response = await fetchDnaSequences(searchString)
+    }
+    setSearchString(searchString)
+  }
+
+  async function handleDelete() {
+    try {
+      let dnaSequencesToDelete = dnaSequences
+      const response = await deleteItems(dnaSequencesToDelete);
+      console.log("refresh search")
+    } catch (error) {
+      console.log(error)
+    } finally {
+      handleSearch(searchString)
+    }
+
+  }
+  async function deleteItems(dnaSequencesToDelete) {
+    console.log("DNA seq in handleDelete:", dnaSequencesToDelete)
+    try {
+      for (let i = 0; i < dnaSequencesToDelete.length; i++) {
+        const dnaSequenceId = dnaSequencesToDelete[i].id
+        const response = await handleDeleteDnaSequence(dnaSequenceId)
+        console.log("inside forloop:" + response)
+      }
+      console.log("end")
+    } catch (error) {
+      console.log(error)
+      return error
     }
   }
 
-  function handleDelete() {
-
-    console.log("DNA seq in handleDelete:", dnaSequences)
-    dnaSequences.forEach(dnaSequence => {
-      try {
-        API.graphql(graphqlOperation(deleteDnaSequence, { input: { id: dnaSequence.id } }))
-      } catch (error) {
-        console.log(error)
-      }
-
-      try {
-        API.graphql(graphqlOperation(deleteCreator, { input: { id: dnaSequence.creator.id } }))
-      } catch (error) {
-        console.log(error)
-      }
-
-    })
-    handleDisplayedSequencesChange([])
-
+  async function handleDeleteDnaSequence(dnaSequenceId) {
+    try {
+      const response = await API.graphql(graphqlOperation(deleteDnaSequence, { input: { id: dnaSequenceId } }))
+      console.log(`deleteDnaSequence`, response)
+      return response
+    } catch (error) {
+      console.log(error)
+      return error
+    }
   }
 
-  function handleDisplayedSequencesChange(dnaSequences) {
-    handleSequenceChange(dnaSequences)
+  async function handleDeleteCreator(creatorId) {
+    try {
+      const response = await API.graphql(graphqlOperation(deleteCreator, { input: { id: creatorId } }))
+      console.log(`deleteCreator`, response)
+      return response
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
+
+  //in order to provide a way to remove creators from their collection we have this function
+  async function handleAllCreatorDelete() {
+    try {
+      let creators = await API.graphql(graphqlOperation(listCreators))
+      console.log("creators: " + JSON.stringify(creators))
+      let creatorIds = await creators.data.listCreators.items
+      creatorIds.forEach(async creator => await handleDeleteCreator(creator.id))
+      setCreatorsDeleteStatus("Creator delete successful")
+    } catch (error) {
+      console.log(error)
+      return error
+    }
+  }
+
+  function handleDisplayedSequencesChange(newDnaSequences) {
+    handleSequenceChange(newDnaSequences)
 
   }
 
@@ -59,19 +106,18 @@ export default function SearchPage() {
         filter: { bases: { contains: searchString } },
         limit: limit
       }))
-      const fetchedDnaSequences = dnaSequenceData.data.listDnaSequences.items
+      const fetchedDnaSequences = await dnaSequenceData.data.listDnaSequences.items
       console.log(fetchedDnaSequences)
       handleDisplayedSequencesChange(fetchedDnaSequences)
+      return fetchedDnaSequences
     } catch (error) {
       console.log(error)
       alert("error fetching dnaSequences")
     }
   }
 
-  useEffect(() => {
-    fetchDnaSequences()
 
-  }, [])
+
 
 
   return (
@@ -84,21 +130,24 @@ export default function SearchPage() {
         </Link>
         <label
           htmlFor="searchString"
-          className="search">
-          Search string:
+          className="search"
+          title="A-T-C-G characters only">
+          Bases Search string:
         </label>
         <input
           type="text"
           name="searchString"
           id="searchString"
-          className="searchInput"
+          className="search-input"
+          placeholder="Search for a base sequence"
           value={searchString}
           onChange={event => handleDnaSequenceSanitation(event.target.value)}
         />
 
-        <button onClick={() => handleSearch()}>Retrieve Matching Sequences</button>
-        <button onClick={() => handleDelete()}>Delete Matching Sequences</button>
-
+        <button onClick={() => handleSearch(searchString)}>Retrieve Matching Sequences</button>
+        <button onClick={() => handleDelete()}>Delete {displayedSequences.length} Displayed Sequences</button>
+        <button onClick={() => handleAllCreatorDelete()}>Delete all creators </button>
+        <div style={{ color: "green", fontSize: "18px", }}>{creatorsDeleteStatus}</div>
 
       </header>
       <div className="">
