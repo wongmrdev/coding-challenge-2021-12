@@ -2,7 +2,7 @@ import './App.css';
 import React, { useState } from 'react'
 import ReactJson from 'react-json-view';
 import AppRoutes from './AppRoutes';
-//import { withAuthenticator } from '@aws-amplify/ui-react'
+import { withAuthenticator } from '@aws-amplify/ui-react';
 //api CRUD section
 import Amplify from 'aws-amplify'
 import awsExports from "./aws-exports";
@@ -62,4 +62,4 @@ function App() {
   );
 }
 
-export default App;
+export default withAuthenticator(App);
