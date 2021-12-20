@@ -1,7 +1,9 @@
 import './App.css';
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Link } from 'react-router-dom';
-
+import { SequenceContext } from './App';
+//graphql queries 
+import { listDnaSequences } from './graphql/queries'
 //api CRUD section
 import Amplify, { API, graphqlOperation } from 'aws-amplify'
 import { createCreator, createDnaSequence } from './graphql/mutations'
@@ -9,7 +11,48 @@ import { getDnaSequence, getCreator } from './graphql/queries'
 import awsExports from "./aws-exports";
 Amplify.configure(awsExports);
 
+
 function App() {
+  const {
+    searchString,
+    handleSequenceChange,
+    setSearchString,
+
+  } = useContext(SequenceContext)
+
+  function handleSearch(searchString = "") {
+    if (searchString === "") {
+      fetchDnaSequences()
+    } else if (searchString.length < 3) {
+      alert("searchs must be greater than 2bp in length")
+    } else {
+      console.log("searching")
+      fetchDnaSequences(searchString)
+    }
+    setSearchString(searchString)
+  }
+
+  async function fetchDnaSequences(searchString = "", limit = 500) {
+    try {
+      const dnaSequenceData = await API.graphql(graphqlOperation(listDnaSequences, {
+        filter: { bases: { contains: searchString } },
+        limit: limit
+      }))
+      const fetchedDnaSequences = dnaSequenceData.data.listDnaSequences.items
+      console.log(fetchedDnaSequences)
+      handleDisplayedSequencesChange(fetchedDnaSequences)
+    } catch (error) {
+      console.log(error)
+      alert("error fetching dnaSequences")
+    }
+  }
+
+
+  function handleDisplayedSequencesChange(newDnaSequences) {
+    handleSequenceChange(newDnaSequences)
+
+  }
+
   const [textAreaValue, setTextAreaValue] = useState("")
   //upload status feedback for the user
   const [uploadStatusList, setUploadStatusList] = useState(["choose files to upload"])
@@ -30,9 +73,9 @@ function App() {
 
     } else {
       setUploadStatusList([...uploadStatusList, "manual input: check your input"])
+
     }
-
-
+    handleSearch(searchString)
 
   }
   //check for valid json submissions
@@ -60,11 +103,18 @@ function App() {
       && item.creator.id !== null
       && item.creator.handle !== null
       && item.creator.name !== null
+      && typeof item.id === "string"
+      && typeof item.createdAt === "string"
+      && typeof item.name === "string"
+      && typeof item.bases === "string"
+      && typeof item.creator.id === "string"
+      && typeof item.creator.handle === "string"
+      && typeof item.creator.name === "string"
     ) {
       return true
     }
     else {
-      console.log("item is missing a property")
+      console.log("item is missing a property or property data-type")
       return false
     }
   }
@@ -72,24 +122,43 @@ function App() {
   //read a file 
 
 
-  function handleFileListSubmit(fileList) { //FileList is an HTML Collection
-
-    let newItems = [];
+  async function handleFileListSubmit(fileList) { //FileList is an HTML Collection
+    let newItems = []
+    //loop over fileList and start async post request
     for (let i = 0; i < fileList.length; i++) {
-      console.log("file name: ", fileList.item(i).name)
-      let item;
+      let item = fileList.item(i)
+      let response = await handleDnaSequenceAdds(item)
+      newItems.push(handleFileListSubmitResponse(item.name, response))
+
+    }
+    handleUploadStatusListChange(newItems)
+    handleSearch(searchString)
+
+  }
+
+  async function handleDnaSequenceAdds(item) {
+    return new Promise((resolve, reject) => {
       let reader = new FileReader();
       reader.onload = function () {
-        item = JSON.parse(reader.result)
-        console.log(item)
-        addDnaSequence(item).then(response => {
-          console.log("response: ", response)
-
-        })
+        let result = JSON.parse(reader.result)
+        let response = addDnaSequence(result)
+        resolve(response)
       }
-      reader.readAsText(fileList.item(i))
+      reader.readAsText(item)
+    })
+
+  }
+
+  function handleFileListSubmitResponse(fileName, addDnaSequenceResposne) {
+    let dnaS = addDnaSequenceResposne.dnaSequence.status ? addDnaSequenceResposne.dnaSequence.status : null
+    let creatorS = addDnaSequenceResposne.creator.status ? addDnaSequenceResposne.creator.status : null
+    let dnaM = addDnaSequenceResposne.dnaSequence.message ? addDnaSequenceResposne.dnaSequence.message : null
+    let creatorM = addDnaSequenceResposne.creator.message ? addDnaSequenceResposne.creator.message : null
+    if (addDnaSequenceResposne.status === false) {
+      return `${fileName}: failed on error`
+    } else {
+      return `${fileName}: DNA Sequence ${dnaS}(${dnaM}), Creator: ${creatorS}(${creatorM})`
     }
-    //update progress of file upload
 
   }
 
@@ -183,7 +252,7 @@ function App() {
         <input type="file" id="bulk-uploads" multiple accept=".json, .txt" onChange={(event) => handleFileListSubmit(event.target.files)}></input>
         <ul>
           {
-            uploadStatusList.map((status, index) => <li key={index}>{status}</li>)
+            uploadStatusList.map((status, index) => <li key={index}>{index}. {status}</li>)
           }
         </ul>
       </div>
