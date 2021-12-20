@@ -249,7 +249,7 @@ function App() {
           rows={25}
 
         />
-        <span className="submit-data-btn" onClick={() => handleTextAreaSubmit()}>Submit Data</span>
+        <span disabled={isDisabled} className="submit-data-btn" onClick={() => handleTextAreaSubmit()}>Submit Data</span>
       </div>
 
       <div id="bulk-uploads-container">Bulk Uploads</div>
