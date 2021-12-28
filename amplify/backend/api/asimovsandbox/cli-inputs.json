@@ -6,7 +6,11 @@
     "gqlSchemaPath": "C:\\Users\\matthew wong\\Documents\\webdev\\2021DecemberInterviewPrep\\asimov_sandbox\\amplify\\backend\\api\\asimovsandbox\\schema.graphql",
     "defaultAuthType": {
       "mode": "API_KEY",
-      "expirationTime": 7
-    }
+      "expirationTime": 31,
+      "apiKeyExpirationDate": "2022-01-28T01:36:43.494Z",
+      "keyDescription": "january"
+    },
+    "conflictResolution": {},
+    "additionalAuthTypes": []
   }
 }
