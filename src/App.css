@@ -16,6 +16,21 @@
   flex-wrap: wrap;
 }
 
+.nav-header {
+  background-color: #282c34;
+  min-height: 5vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  justify-content: space-evenly;
+  font-size: calc(16px);
+  color: white;
+  text-align: center;
+  padding: 5px;
+  flex-wrap: wrap;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -42,8 +57,8 @@
 .nav-btn {
   text-decoration: none;
   color: white;
-  background-color: #15d798;
-  border-radius: 3px;
+  background-color: #d76315;
+  border-radius: 0px;
   padding: 10px 20px;
 }
 
