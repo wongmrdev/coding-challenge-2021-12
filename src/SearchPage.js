@@ -21,18 +21,14 @@ export default function SearchPage() {
   const [creatorsDeleteStatus, setCreatorsDeleteStatus] = useState('')
   const [isDisabled, setIsDisabled] = useState(false)
 
-
   async function handleSearch(searchString = "") {
     setIsDisabled(true)
     if (searchString === "") {
       const response = await fetchDnaSequences()
-
     } else if (searchString.length < 3) {
       alert("searchs must be greater than 2bp in length")
-
     } else {
       const response = await fetchDnaSequences(searchString)
-
     }
     setSearchString(searchString)
     setIsDisabled(false)
@@ -44,15 +40,15 @@ export default function SearchPage() {
       let dnaSequencesToDelete = dnaSequences
       const response = await deleteItems(dnaSequencesToDelete);
     } catch (error) {
-      console.log(error)
+      console.error(error)
     } finally {
       handleSearch(searchString)
       setIsDisabled(false)
     }
-
   }
+
   async function deleteItems(dnaSequencesToDelete) {
-    //console.log("DNA seq in handleDelete:", dnaSequencesToDelete)
+
     try {
       for (let i = 0; i < dnaSequencesToDelete.length; i++) {
         const dnaSequenceId = dnaSequencesToDelete[i].id
@@ -60,7 +56,7 @@ export default function SearchPage() {
       }
 
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return error
     }
   }
@@ -68,22 +64,20 @@ export default function SearchPage() {
   async function handleDeleteDnaSequence(dnaSequenceId) {
     try {
       const response = await API.graphql(graphqlOperation(deleteDnaSequence, { input: { id: dnaSequenceId } }))
-      //console.log(`deleteDnaSequence`, response)
+
       return response
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return error
     }
   }
 
   async function handleDeleteCreator(creatorId) {
     try {
-
       const response = await API.graphql(graphqlOperation(deleteCreator, { input: { id: creatorId } }))
-      //console.log(`deleteCreator`, response)
       return response
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return error
     }
   }
@@ -97,7 +91,7 @@ export default function SearchPage() {
       creatorIds.forEach(async creator => await handleDeleteCreator(creator.id))
       setCreatorsDeleteStatus("Creator delete successful")
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return error
     } finally {
       setIsDisabled(false)
@@ -117,11 +111,11 @@ export default function SearchPage() {
         signal
       }))
       const fetchedDnaSequences = await dnaSequenceData.data.listDnaSequences.items
-      //console.log(fetchedDnaSequences)
+
       handleDisplayedSequencesChange(fetchedDnaSequences)
       return fetchedDnaSequences
     } catch (error) {
-      console.log(error)
+      console.error(error)
       alert("error fetching dnaSequences")
     }
   }
@@ -134,19 +128,14 @@ export default function SearchPage() {
         if (err.name === "AbortError") {
           console.log("successfully aborted");
         } else {
-          console.log(err);
+          console.error(err);
         }
       });
       return () => {
         controller.abort()
       }
     }
-
   }, [])
-
-
-
-
 
   return (
     <div className="App">
@@ -171,17 +160,14 @@ export default function SearchPage() {
           value={searchString}
           onChange={event => handleDnaSequenceSanitation(event.target.value)}
         />
-
         <button disabled={isDisabled} onClick={() => handleSearch(searchString)}>Retrieve Matching Sequences</button>
         <button disabled={isDisabled} onClick={() => handleDelete()}>Delete {displayedSequences.length} Displayed Sequences</button>
         <button disabled={isDisabled} onClick={() => handleAllCreatorDelete()}>Delete all creators </button>
         <div style={{ color: "green", fontSize: "18px", }}>{creatorsDeleteStatus}</div>
-
       </header>
       <div className="">
         {displayedSequences}
       </div>
-
     </div>
   )
 }

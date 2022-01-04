@@ -21,7 +21,7 @@ The App is deployed on the AWS Global Cloudfront CDN from an S3 Bucket.
 8. Add Memoization And Query Cache
 9. Remove Creators Only When All Their DNA Sequences Are Removed
 10. Add Data Streams To Other Applications
-11. Paginations/Lazy Loading
+11. Paginations/Lazy Loading has been added to the URI /lazy
 
 # Thoughts
 

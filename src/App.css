@@ -120,3 +120,7 @@ a[disabled],
 span[disabled] {
   pointer-events: none;
 }
+
+span.submit-data-btn:hover {
+  cursor: pointer;
+}
