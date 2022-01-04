@@ -1,7 +1,9 @@
-import React, { useState, useRef, useCallback } from 'react'
-import "./css/LazyLoading.css"
-import useDnaSequenceSearch from './useDnaSequenceSearch'
+import React, { useState, useRef, useCallback } from 'react';
+import "./css/LazyLoading.css";
+import useDnaSequenceSearch from './useDnaSequenceSearch';
 import ReactJson from 'react-json-view';
+import "./App.css";
+import { Link } from 'react-router-dom';
 
 export default function LazyLoading() {
 
@@ -38,6 +40,13 @@ export default function LazyLoading() {
 
     return (
         <>
+            <header className="nav-header">
+                {<Link className="nav-btn" to='/search'>
+                    <div>
+                        Search Data
+                    </div>
+                </Link>}
+            </header>
             <div className="lazy-container">
                 <input type="text" value={query} onChange={handleSearch}></input>
                 {dnaSequences.map((dnaSequence, index) => {

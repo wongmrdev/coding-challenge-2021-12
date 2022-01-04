@@ -139,12 +139,21 @@ export default function SearchPage() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <Link disabled={isDisabled} className="nav-btn" to='/data-upload'>
+      <header className="nav-header">
+        <Link disabled={isDisabled} className="nav-btn red" to='/data-upload'>
           <div>
             Import Data
           </div>
         </Link>
+        <Link disabled={isDisabled} className="nav-btn red" to='/lazy'>
+          <div>
+            Pagination example
+          </div>
+        </Link>
+
+      </header>
+
+      <header className="App-header">
         <label
           htmlFor="searchString"
           className="search"
@@ -163,6 +172,7 @@ export default function SearchPage() {
         <button disabled={isDisabled} onClick={() => handleSearch(searchString)}>Retrieve Matching Sequences</button>
         <button disabled={isDisabled} onClick={() => handleDelete()}>Delete {displayedSequences.length} Displayed Sequences</button>
         <button disabled={isDisabled} onClick={() => handleAllCreatorDelete()}>Delete all creators </button>
+
         <div style={{ color: "green", fontSize: "18px", }}>{creatorsDeleteStatus}</div>
       </header>
       <div className="">

@@ -223,12 +223,16 @@ function App() {
     <div>
 
       <div className="App">
-        <header className="App-header">
+        <header className="nav-header">
           {<Link disabled={isDisabled} className="nav-btn" to='/search'>
             <div>
               Search Data
             </div>
           </Link>}
+        </header>
+
+        <header className="App-header">
+
           <label id="data-upload-title" htmlFor="createDnaSequence">Add JSON format DNA Sequence</label>
         </header>
       </div>
