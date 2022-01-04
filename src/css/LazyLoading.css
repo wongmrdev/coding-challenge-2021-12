@@ -1,0 +1,21 @@
+.card {
+  background-color: aqua;
+  height: 250px;
+  width: 150px;
+  margin: 25px;
+}
+
+.isVisible {
+  position: fixed;
+  width: 100%;
+  align-items: center;
+  top: 0;
+  background-color: coral;
+  color: beige;
+  font-size: 20px;
+  padding: 40px;
+}
+
+.lazy-container {
+  font-size: 1.75rem;
+}
