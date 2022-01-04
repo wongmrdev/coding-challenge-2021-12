@@ -24,18 +24,14 @@ export default function useDnaSequenceSearch(query, nextToken) {
       signal,
       ...nextToken && { nextToken: nextToken }
     })).then(dnaSequenceData => {
-      console.log(dnaSequenceData)
-      console.log(dnaSequenceData.data.listDnaSequences.items)
       setDnaSequences(prevDnaSequences => {
         return [...new Set([...prevDnaSequences, ...dnaSequenceData.data.listDnaSequences.items])]
       })
       if (dnaSequenceData.data.listDnaSequences.nextToken) { nextNextToken.current = dnaSequenceData.data.listDnaSequences.nextToken }
-      console.log(nextNextToken)
       setLoading(false)
     }).catch(err => {
       if (err.name === "AbortError") return
       setError(true)
-      console.log(err)
     })
     return () => {
       controller.abort()

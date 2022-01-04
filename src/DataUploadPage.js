@@ -26,7 +26,7 @@ function App() {
     } else if (searchString.length < 3) {
       alert("searchs must be greater than 2bp in length")
     } else {
-      //console.log("searching")
+
       fetchDnaSequences(searchString)
     }
     setSearchString(searchString)
@@ -39,10 +39,10 @@ function App() {
         limit: limit
       }))
       const fetchedDnaSequences = dnaSequenceData.data.listDnaSequences.items
-      //console.log(fetchedDnaSequences)
+
       handleDisplayedSequencesChange(fetchedDnaSequences)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       alert("error fetching dnaSequences")
     }
   }
@@ -66,7 +66,11 @@ function App() {
 
   function handleTextAreaSubmit() {
     setIsDisabled(true)
-    isJson(textAreaValue) ? console.log(textAreaValue) : setUploadStatusList([...uploadStatusList, "text area not valid Json"])
+    if (!isJson(textAreaValue)) {
+      setUploadStatusList([...uploadStatusList, "text area not valid Json"])
+      setIsDisabled(false)
+      return
+    }
     let dnaSequence = JSON.parse(textAreaValue)
     if (hasDnaSequenceProperties(dnaSequence)) {
       addDnaSequence(dnaSequence).then(response => {
@@ -117,7 +121,7 @@ function App() {
       return true
     }
     else {
-      console.log("item is missing a property or property data-type")
+      console.error("item is missing a property or property data-type is incorrect")
       return false
     }
   }
@@ -192,32 +196,23 @@ function App() {
     try {
       if (!hasDnaSequenceProperties(dnaSequenceObject)) { return false }
       const dnaSequence = await API.graphql(graphqlOperation(getDnaSequence, { id: dnaSequenceObject.id }))
-      //console.log(dnaSequence)
       const creator = await API.graphql(graphqlOperation(getCreator, { id: dnaSequenceObject.creator.id }))
-      //console.log(creator)
       if (dnaSequence.data.getDnaSequence) {
-        //console.log("sequence exists")
         response = { ...response, dnaSequence: { status: "failed", message: "DNA Sequence already exists" } }
       } else {
         await API.graphql(graphqlOperation(createDnaSequence, { input: dnaSequenceObjectInput }))
-        //console.log("upload complete for DNA Sequence" + dnaSequenceObject.name)
         response = { ...response, dnaSequence: { status: "success", message: "Upload success" } }
       }
       if (creator.data.getCreator) {
-        //console.log("creator exists")
         response = { ...response, creator: { status: "failed", message: "creator Already Exists" } }
       } else {
         await API.graphql(graphqlOperation(createCreator, { input: creatorObjectInput }))
-        //console.log("upload complete for creator Sequence" + dnaSequenceObject.creator.name)
         response = { ...response, creator: { status: "success" } }
       }
       return response
-
     } catch (error) {
-      console.log("error adding DNA sequence on POST", error)
       response = { status: "failed", message: "unknown error, see log", creator: { status: "failed" }, dnaSequence: { status: "failed" } }
       return response
-
     }
 
   }
@@ -235,23 +230,18 @@ function App() {
             </div>
           </Link>}
           <label id="data-upload-title" htmlFor="createDnaSequence">Add JSON format DNA Sequence</label>
-
-
         </header>
       </div>
       <div className="data-upload-container">
         <textarea
           value={textAreaValue}
           onChange={(event) => handleTextAreaChange(event.target.value)}
-
           name="createDnaSequence"
           cols={100}
           rows={25}
-
         />
         <span disabled={isDisabled} className="submit-data-btn" onClick={() => handleTextAreaSubmit()}>Submit Data</span>
       </div>
-
       <div id="bulk-uploads-container">Bulk Uploads</div>
       <div className="vertical-flex-container">
         <input disabled={isDisabled} type="file" id="bulk-uploads" multiple accept=".json, .txt" onChange={(event) => handleFileListSubmit(event.target.files)}></input>
